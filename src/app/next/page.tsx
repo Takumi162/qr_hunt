@@ -1,4 +1,4 @@
-import { getNextHint } from "@/lib/db/hint";
+import { getNextHint } from "@/lib/db/treasures";
 
 export default async function NextPage() {
   const treasure = await getNextHint();
