@@ -3,27 +3,30 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { advanceFromTreasure } from "@/lib/db/treasures";
+import { logTreasureFound } from "@/lib/db/foundTreasures";
 
 export default function ClaimPage() {
   const router = useRouter();
-  const params = useParams();        // ← これ必須
-  const treasureId = params.treasureId as string;   // ← 取り出す
+  const params = useParams();
+  const treasureId = params.treasureId as string;
 
   const [message, setMessage] = useState("QRを確認中…");
 
   useEffect(() => {
     async function run() {
+      const id = treasureId; // 安全な string
+
       try {
-        const result = await advanceFromTreasure(treasureId);
+        const result = await advanceFromTreasure(id);
 
         if (result.status === "not-found") {
           setMessage("このQRは存在しません。");
           return;
         }
 
-        if (result.status === "is_found"){
-            setMessage("このお宝は発見済みです。");
-            return;
+        if (result.status === "is-found") {
+          setMessage("このお宝はすでに発見されました。");
+          return;
         }
 
         if (result.status === "not-active") {
@@ -32,8 +35,19 @@ export default function ClaimPage() {
         }
 
         // 成功
-        setMessage("発見！次のお宝へ移動します…");
-        setTimeout(() => router.push("/next"), 1000);
+        if (result.status === "advanced") {
+
+          // 発見ログを追加
+          await logTreasureFound(id);
+
+          setMessage("おめでとう！次のお宝のヒントへ移動します…");
+
+          setTimeout(() => {
+            router.push("/next");
+          }, 1000);
+
+          return;
+        }
 
       } catch (e) {
         console.error(e);

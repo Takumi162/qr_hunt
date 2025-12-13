@@ -77,7 +77,7 @@ export async function advanceFromTreasure(scannedId: string) {
 
   // ② 今アクティブなお宝かどうかチェック
   if (!current.isActive) {
-    if(current.isFound == true) return { status: "is_found" as const };
+    if(current.isFound == true) return { status: "is-found" as const };
     
     // もう終わってる or まだ出番じゃない宝
     return { status: "not-active" as const };
