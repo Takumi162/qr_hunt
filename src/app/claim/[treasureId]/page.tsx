@@ -21,6 +21,11 @@ export default function ClaimPage() {
           return;
         }
 
+        if (result.status === "is_found"){
+            setMessage("このお宝は発見済みです。");
+            return;
+        }
+
         if (result.status === "not-active") {
           setMessage("このお宝は現在のターンではありません。");
           return;
