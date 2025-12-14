@@ -3,6 +3,7 @@ import { getFoundGiftCards } from "@/lib/db/foundTreasures";
 
 export default async function FoundPage() {
   const items = await getFoundGiftCards();
+  
 
   return (
     <main
