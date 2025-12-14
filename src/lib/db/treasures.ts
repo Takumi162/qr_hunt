@@ -1,5 +1,7 @@
 import { db } from "../firebase";
 import { query,collection,where,getDocs,getDoc,doc,updateDoc,orderBy,limit } from "firebase/firestore";
+import { Treasure } from "@/types/treasure";
+
 
 
 //Firebaseと通信する関数（データの取得や編集）はこのファイルにまとめる。
@@ -35,27 +37,40 @@ export async function getNextHint() {
 
 
 //読み込まれたQRコードが「どのお宝のQRコードだったか」を確かめるために、お宝をidで検索するための関数を作る。
-export async function getTreasureById(id :string){
-    const ref = doc(db,"treasures",id);
-    const snap = await getDoc(ref);
 
-    if(!snap.exists()){
-        console.log("該当するお宝を見つけられませんでした。");
-        return null;
-        
-    }
 
-    return {
-        id:snap.id,
-        hintText: snap.data().hintText,
-        hintImageUrl: snap.data().hintImageUrl,
-        answerText: snap.data().answerText,
-        answerImageUrl: snap.data().answerImageUrl,
-        order: snap.data().order,
-        isActive: snap.data().isActive,
-        isFound: snap.data().isFound,
-    }
+
+export async function getTreasureById(treasureId: string) {
+  const ref = doc(db, "treasures", treasureId);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return null;
+
+  const data: any = snap.data();
+
+  return {
+    id: snap.id,
+    hintText: data.hintText ?? "",
+    hintImageUrl: data.hintImageUrl ?? null,
+    answerText: data.answerText ?? "",
+    answerImageUrl: data.answerImageUrl ?? null,
+    order: data.order ?? 0,
+    isActive: data.isActive ?? false,
+    isFound: data.isFound ?? false,
+
+    gift: data.gift
+      ? {
+          title: data.gift.title ?? "",
+          imageUrl: data.gift.imageUrl ?? null,
+          shopName: data.gift.shopName ?? "",
+          description: data.gift.description ?? "", // ← これが大事
+          price: data.gift.price ?? null,
+        }
+      : null,
+  };
 }
+
+
 
 
 // QRで読まれた treasureId からゲームを1ステップ進める
